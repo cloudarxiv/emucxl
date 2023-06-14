@@ -34,7 +34,7 @@ static struct cdev c_dev;
 static struct class *cl;
 
 static unsigned char *buffer;
-static unsigned char array[10]={0,1,2,3,4,5,6,7,8,9};
+static unsigned char array[10]={0,1,2,3,4,10,6,7,8,9};
 
 /* Open*/
 static int my_open(struct inode *i, struct file *f)
@@ -51,19 +51,34 @@ static int my_close(struct inode *i, struct file *f)
 /* Custom MMAP*/
 static int my_mmap(struct file *filp, struct vm_area_struct *vma)
 {
-
+	phys_addr_t phys_addr;
+	pid_t pid;
     unsigned long page;
     unsigned char i;
     unsigned long start = (unsigned long)vma->vm_start;
     unsigned long size = (unsigned long)(vma->vm_end - vma->vm_start);
 	unsigned long node = vma->vm_pgoff << PAGE_SHIFT >> PAGE_SHIFT;
 	printk(KERN_INFO "node= %lu and size = %lu\n", node, size);
+	printk("vma start address : %p\n", (void*) start);
+
+	buffer = (unsigned char *)kmalloc_node(size, GFP_USER | __GFP_ZERO, node);  // alloc some mem.
+	phys_addr = virt_to_phys((void *)buffer);
+	if (!phys_addr) {
+		pr_alert("Error: Virtual Address 0x%p of PID: %d does not exist... \n", (void*)buffer, pid);
+		return -1;
+	}
+	pr_info("NUMA_NODE: %ld \t Virtual Address: 0x%px \t Physical Address: 0x%llx \n", node, (void*)buffer, phys_addr);
+	printk(KERN_INFO "address = 0x%p\n", (void*)buffer);
+	SetPageReserved(virt_to_page(buffer));  // set this page as reserved.
     page = virt_to_phys(buffer); // get the physical address from virtual.
     if(remap_pfn_range(vma, start, page>>PAGE_SHIFT, size, PAGE_SHARED))
         return -1;
 
     for(i=0; i<10; i++)  // write some data
-        buffer[i] = array[i];
+	{
+        buffer[i] = array[i] + i;
+		array[i] = array[i] + i;
+	}
 
     return 0;
 }
@@ -95,6 +110,7 @@ static long my_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
 	pid_t pid;
 	emucxl_lib_t nod;
 	int numa_node;
+	//int i;
 
 	switch (cmd)
 	{
@@ -128,8 +144,24 @@ static long my_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
 			break;
 
 		case EMUCXL_FREE:
+			// printk(KERN_INFO "address = 0x%p\n", (void*)buffer);
+			// printk(KERN_INFO "Print data \n");
+
+			// for(i=0; i<10; i++)  // write some data
+			// 	printk(KERN_INFO "%d ", buffer[i]);
+			// printk(KERN_INFO "\n");
 			ClearPageReserved(virt_to_page(buffer)); // reset reserved
+			// printk(KERN_INFO "Print data after reset reserved \n");
+
+			// for(i=0; i<10; i++)  // write some data
+			// 	printk(KERN_INFO "%d ", buffer[i]);
+			// printk(KERN_INFO "\n");
 			kfree(buffer);  // free the memory
+			// printk(KERN_INFO "Print data after kfree \n");
+
+			// for(i=0; i<10; i++)  // write some data
+			// 	printk(KERN_INFO "%d ", buffer[i]);
+			// printk(KERN_INFO "\n");
 			break;
 		default:
 			return -EINVAL;

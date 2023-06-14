@@ -46,9 +46,12 @@ int main(int argc , char *argv[])
     //     printf("%d ", p_map[i]);
     // printf("\n\n");
 
-    // free
+    // // free
     emucxl_free((void*)p_map, PAGE_SIZE);
     printf("hi\n\n");
+    p_map = (unsigned char *)emucxl_alloc(PAGE_SIZE, REMOTE_MEMORY);
+    printf("pmap address in user space memory : %p\n", p_map);
+    emucxl_free((void*)p_map, PAGE_SIZE);
     emucxl_exit();
     printf("hi2\n\n");
     return 0;
