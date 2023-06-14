@@ -34,7 +34,7 @@ static struct cdev c_dev;
 static struct class *cl;
 
 static unsigned char *buffer;
-static unsigned char array[10]={0,1,2,3,4,10,6,7,8,9};
+static unsigned char array[10]={0,1,2,3,4,5,6,7,8,9};
 
 /* Open*/
 static int my_open(struct inode *i, struct file *f)
@@ -59,8 +59,7 @@ static int my_mmap(struct file *filp, struct vm_area_struct *vma)
     unsigned long size = (unsigned long)(vma->vm_end - vma->vm_start);
 	unsigned long node = vma->vm_pgoff << PAGE_SHIFT >> PAGE_SHIFT;
 	printk(KERN_INFO "node= %lu and size = %lu\n", node, size);
-	printk("vma start address : %p\n", (void*) start);
-
+	pid = current->pid;
 	buffer = (unsigned char *)kmalloc_node(size, GFP_USER | __GFP_ZERO, node);  // alloc some mem.
 	phys_addr = virt_to_phys((void *)buffer);
 	if (!phys_addr) {
@@ -75,10 +74,7 @@ static int my_mmap(struct file *filp, struct vm_area_struct *vma)
         return -1;
 
     for(i=0; i<10; i++)  // write some data
-	{
-        buffer[i] = array[i] + i;
-		array[i] = array[i] + i;
-	}
+        buffer[i] = array[i] * i;
 
     return 0;
 }
@@ -103,14 +99,12 @@ static int my_ioctl(struct inode *i, struct file *f, unsigned int cmd, unsigned 
 static long my_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
 #endif
 {
-	/*
-	
-	*/
-	phys_addr_t phys_addr;
+	#ifdef DEBUG
+		phys_addr_t phys_addr;
+		emucxl_lib_t nod;
+		int numa_node;
+	#endif
 	pid_t pid;
-	emucxl_lib_t nod;
-	int numa_node;
-	//int i;
 
 	switch (cmd)
 	{
@@ -126,42 +120,31 @@ static long my_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
 			break;
 
 		case EMUCXL_ALLOC:
-			if (copy_from_user(&nod, (emucxl_lib_t *)arg, sizeof(emucxl_lib_t)))
-			{
-				return -EACCES;
-			}
-			numa_node = nod.numa_node;
-			buffer = (unsigned char *)kmalloc_node(nod.size, GFP_USER | __GFP_ZERO, numa_node);  // alloc some mem.
-			phys_addr = virt_to_phys((void *)buffer);
-			if (!phys_addr) {
-				pr_alert("Error: Virtual Address 0x%p of PID: %d does not exist... \n", (void*)buffer, pid);
-				copy_to_user_fun(arg, -1);
-				return -1;
-			}
-			pr_info("NUMA_NODE: %d \t Virtual Address: 0x%px \t Physical Address: 0x%llx \n", numa_node, (void*)buffer, phys_addr);
-			printk(KERN_INFO "address = 0x%p\n", (void*)buffer);
-			SetPageReserved(virt_to_page(buffer));  // set this page as reserved.
+			#ifdef DEBUG
+				pid = task_pid_nr(current);
+				if (copy_from_user(&nod, (emucxl_lib_t *)arg, sizeof(emucxl_lib_t)))
+				{
+					return -EACCES;
+				}
+				numa_node = nod.numa_node;
+				buffer = (unsigned char *)kmalloc_node(nod.size, GFP_USER | __GFP_ZERO, numa_node);  // alloc some mem.
+				phys_addr = virt_to_phys((void *)buffer);
+				if (!phys_addr) {
+					pr_alert("Error: Virtual Address 0x%p of PID: %d does not exist... \n", (void*)buffer, pid);
+					copy_to_user_fun(arg, -1);
+					return -1;
+				}
+				pr_info("NUMA_NODE: %d \t Virtual Address: 0x%px \t Physical Address: 0x%llx \n", numa_node, (void*)buffer, phys_addr);
+				printk(KERN_INFO "address = 0x%p\n", (void*)buffer);
+				SetPageReserved(virt_to_page(buffer));  // set this page as reserved.
+			#endif
 			break;
 
 		case EMUCXL_FREE:
-			// printk(KERN_INFO "address = 0x%p\n", (void*)buffer);
-			// printk(KERN_INFO "Print data \n");
-
-			// for(i=0; i<10; i++)  // write some data
-			// 	printk(KERN_INFO "%d ", buffer[i]);
-			// printk(KERN_INFO "\n");
-			ClearPageReserved(virt_to_page(buffer)); // reset reserved
-			// printk(KERN_INFO "Print data after reset reserved \n");
-
-			// for(i=0; i<10; i++)  // write some data
-			// 	printk(KERN_INFO "%d ", buffer[i]);
-			// printk(KERN_INFO "\n");
-			kfree(buffer);  // free the memory
-			// printk(KERN_INFO "Print data after kfree \n");
-
-			// for(i=0; i<10; i++)  // write some data
-			// 	printk(KERN_INFO "%d ", buffer[i]);
-			// printk(KERN_INFO "\n");
+				#ifdef DEBUG
+					ClearPageReserved(virt_to_page(buffer)); // reset reserved
+					kfree(buffer);  // free the memory
+				#endif
 			break;
 		default:
 			return -EINVAL;
@@ -200,7 +183,7 @@ static int __init emucxl_mmap_init(void)
 	{
 		return ret;
 	}
-	
+
 	if (IS_ERR(cl = class_create(THIS_MODULE, "char")))
 	{
 		cdev_del(&c_dev);

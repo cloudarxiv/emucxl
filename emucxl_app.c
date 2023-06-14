@@ -28,8 +28,14 @@ int main(int argc , char *argv[])
     // allocate
     p_map = (unsigned char *)emucxl_alloc(PAGE_SIZE, LOCAL_MEMORY);
     printf("pmap address in user space memory : %p\n", p_map);
+
+    printf("\n Read data \n");
     for(i = 0; i < 10; i++)
         printf("%d ", p_map[i]);
+    
+    printf("\n Write data \n");
+    for(i = 0; i < 10; i++)
+        p_map[i] = i;
     printf("\n\n");
 
     // // migrate 
@@ -39,19 +45,16 @@ int main(int argc , char *argv[])
     //     printf("%d ", p_map[i]);
     // printf("\n\n");
 
-    // // resize
-    // p_map = (unsigned char *)emucxl_resize((void*)p_map, REMOTE_MEMORY, PAGE_SIZE, PAGE_SIZE);
-    // printf("pmap address in user space memory : %p\n", p_map);
-    // for(i = 0; i < 10; i++)
-    //     printf("%d ", p_map[i]);
-    // printf("\n\n");
+    // resize
+    p_map = (unsigned char *)emucxl_resize((void*)p_map, LOCAL_MEMORY, PAGE_SIZE, PAGE_SIZE);
+    printf("pmap address in user space memory : %p\n", p_map);
+    for(i = 0; i < 10; i++)
+        printf("%d ", p_map[i]);
+    printf("\n\n");
 
-    // // free
+    // free
     emucxl_free((void*)p_map, PAGE_SIZE);
     printf("hi\n\n");
-    p_map = (unsigned char *)emucxl_alloc(PAGE_SIZE, REMOTE_MEMORY);
-    printf("pmap address in user space memory : %p\n", p_map);
-    emucxl_free((void*)p_map, PAGE_SIZE);
     emucxl_exit();
     printf("hi2\n\n");
     return 0;
