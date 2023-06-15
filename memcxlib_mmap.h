@@ -1,5 +1,5 @@
-#ifndef EMUCXL_MMAP_H
-#define EMUCXL_MMAP_H
+#ifndef MEMCXLIB_MMAP_H
+#define MEMCXLIB_MMAP_H
 
 #include <linux/ioctl.h>
 #include <linux/types.h>
@@ -15,31 +15,31 @@
 // 	void* address;
 // 	int ret;
 // 	int numa_node;
-// } emucxl_arg_t;
+// } memcxlib_arg_t;
 
 // typedef struct
 // {
 // 	int* address;
 // 	int index;
 // 	int value;
-// } emucxl_memory_t;
+// } memcxlib_memory_t;
 
 typedef struct 
 { 
     int return_value;
-} emucxl_arg_t;
+} memcxlib_arg_t;
 
 typedef struct
 {
     int size;
     int numa_node;
-} emucxl_lib_t;
+} memcxlib_lib_t;
 
 
-#define EMUCXL_INIT _IOW('e', 1, emucxl_arg_t *)
-#define EMUCXL_EXIT _IO('e', 2)
-#define EMUCXL_FREE _IO('e', 4)
-#define EMUCXL_ALLOC _IOR('e', 3, emucxl_lib_t *)
+#define MEMCXLIB_INIT _IOW('e', 1, memcxlib_arg_t *)
+#define MEMCXLIB_EXIT _IO('e', 2)
+#define MEMCXLIB_FREE _IO('e', 4)
+#define MEMCXLIB_ALLOC _IOR('e', 3, memcxlib_lib_t *)
 
 
 #define FIRST_MINOR 0

@@ -27,7 +27,7 @@
 /* END: For NUMA NODE*/
 
 
-#include "emucxl_mmap.h"
+#include "memcxlib_mmap.h"
 
 static dev_t dev;
 static struct cdev c_dev;
@@ -81,9 +81,9 @@ static int my_mmap(struct file *filp, struct vm_area_struct *vma)
 
 int copy_to_user_fun(unsigned long arg, int ret)
 {
-	emucxl_arg_t rets;
+	memcxlib_arg_t rets;
 	rets.return_value = ret;
-	if (copy_to_user((emucxl_arg_t *)arg, &rets, sizeof(emucxl_arg_t)))
+	if (copy_to_user((memcxlib_arg_t *)arg, &rets, sizeof(memcxlib_arg_t)))
 	{
 		return -EACCES;
 	}
@@ -101,28 +101,28 @@ static long my_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
 {
 	#ifdef DEBUG
 		phys_addr_t phys_addr;
-		emucxl_lib_t nod;
+		memcxlib_lib_t nod;
 		int numa_node;
 	#endif
 	pid_t pid;
 
 	switch (cmd)
 	{
-		case EMUCXL_INIT:
+		case MEMCXLIB_INIT:
 			pid = task_pid_nr(current);
 			pr_info("INIT PID: %d\n", pid);
 			if(copy_to_user_fun(arg, 0) != 0)
 				return -EACCES;
 			break;
-		case EMUCXL_EXIT:
+		case MEMCXLIB_EXIT:
 			pid = task_pid_nr(current);
 			pr_info("EXIT PID: %d\n", pid);
 			break;
 
-		case EMUCXL_ALLOC:
+		case MEMCXLIB_ALLOC:
 			#ifdef DEBUG
 				pid = task_pid_nr(current);
-				if (copy_from_user(&nod, (emucxl_lib_t *)arg, sizeof(emucxl_lib_t)))
+				if (copy_from_user(&nod, (memcxlib_lib_t *)arg, sizeof(memcxlib_lib_t)))
 				{
 					return -EACCES;
 				}
@@ -140,7 +140,7 @@ static long my_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
 			#endif
 			break;
 
-		case EMUCXL_FREE:
+		case MEMCXLIB_FREE:
 				#ifdef DEBUG
 					ClearPageReserved(virt_to_page(buffer)); // reset reserved
 					kfree(buffer);  // free the memory
@@ -167,12 +167,12 @@ static struct file_operations query_fops =
 	#endif
 };
 
-static int __init emucxl_mmap_init(void)
+static int __init memcxlib_mmap_init(void)
 {
 	int ret;
 	struct device *dev_ret;
 
-	if ((ret = alloc_chrdev_region(&dev, FIRST_MINOR, MINOR_CNT, "emucxl_ioctl")) < 0)
+	if ((ret = alloc_chrdev_region(&dev, FIRST_MINOR, MINOR_CNT, "memcxlib_ioctl")) < 0)
 	{
 		return ret;
 	}
@@ -190,29 +190,29 @@ static int __init emucxl_mmap_init(void)
 		unregister_chrdev_region(dev, MINOR_CNT);
 		return PTR_ERR(cl);
 	}
-	if (IS_ERR(dev_ret = device_create(cl, NULL, dev, NULL, "emucxl")))
+	if (IS_ERR(dev_ret = device_create(cl, NULL, dev, NULL, "memcxlib")))
 	{
 		class_destroy(cl);
 		cdev_del(&c_dev);
 		unregister_chrdev_region(dev, MINOR_CNT);
 		return PTR_ERR(dev_ret);
 	}
-	printk(KERN_INFO "Emucxl_mmap driver registered");
+	printk(KERN_INFO "MemCXLib_mmap driver registered");
 	return 0;
 }
 
-static void __exit emucxl_mmap_exit(void)
+static void __exit memcxlib_mmap_exit(void)
 {
 	device_destroy(cl, dev);
 	class_destroy(cl);
 	cdev_del(&c_dev);
 	unregister_chrdev_region(dev, MINOR_CNT);
-	printk(KERN_INFO "Emucxl_mmap driver unregistered");
+	printk(KERN_INFO "Memcxlib_mmap driver unregistered");
 }
 
-module_init(emucxl_mmap_init);
-module_exit(emucxl_mmap_exit);
+module_init(memcxlib_mmap_init);
+module_exit(memcxlib_mmap_exit);
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Raja Gond <rajagond@cse.iitb.ac.in>");
-MODULE_DESCRIPTION("Basic Emucxl Library");
+MODULE_DESCRIPTION("Basic Memcxlib Library");

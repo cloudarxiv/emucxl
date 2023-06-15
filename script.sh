@@ -2,9 +2,9 @@
 
 make clean
 make
-sudo insmod emucxl_mmap.ko
-sudo ./emucxl_app &
+sudo insmod memcxlib_mmap.ko
+sudo ./memcxlib_app &
 sleep 1
-sudo ./emucxl_app
-sudo rmmod emucxl_mmap
+sudo ./memcxlib_app
+sudo rmmod memcxlib_mmap
 sudo dmesg | tail -20
