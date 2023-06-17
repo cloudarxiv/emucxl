@@ -78,4 +78,15 @@ int getNumaNode(data_t **data, void* address);
 
 int getSizeOfAllocatedMemory(data_t **data, int numa_node);
 
+
+
+// Structure definition for Key_value
+typedef struct Key_value {
+    char key[50];
+    int value;
+    struct Key_value *next;
+} Key_value;
+
+
+
 #endif /* MEMORY_H */
