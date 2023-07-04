@@ -9,6 +9,27 @@
 #include <sys/types.h>
 #include "emucxl_kernel.h"
 
+#define PAGE_SIZE 4096
+
+extern const char* dev_file;
+
+typedef struct data
+{
+    void* address;
+    int size;
+    int numa_node; // 0 for local memory, 1 for remote memory
+
+    struct data* next;
+} data_t;
+
+
+// Structure definition for Key_value
+typedef struct Key_value {
+    char key[50];
+    int value;
+    struct Key_value *next;
+} Key_value;
+
 void emucxl_init();
 void* emucxl_alloc(size_t size, int node);
 void emucxl_free(void* ptr, size_t size);
@@ -45,48 +66,16 @@ int emucxl_get_numa_node(void* ptr);
 size_t emucxl_get_size(void* ptr);
 
 // Get the size of the allocated memory on a specific numa node
-size_t emucxl_get_size_of_allocated_memory(int numa_node);
-
-
-extern const char* dev_file;
-
-#define LOCAL_MEMORY 0
-#define REMOTE_MEMORY 0
-#define PAGE_SIZE 4096
-
-typedef struct data
-{
-    void* address;
-    int size;
-    int numa_node; // 0 for local memory, 1 for remote memory
-
-    struct data* next;
-} data_t;
+size_t emucxl_stats(int numa_node);
 
 data_t **dataAlloc(void);
 void dataFree(data_t **data);
-
 void* getItem(data_t **data, void* address);
-
 void deleteItem(data_t **data, void* address);
-
 void addItem(data_t **data, void* address, int size, int numa_node);
-
 size_t getSize(data_t **data, void* address);
-
 int getNumaNode(data_t **data, void* address);
-
 int getSizeOfAllocatedMemory(data_t **data, int numa_node);
-
-
-
-// Structure definition for Key_value
-typedef struct Key_value {
-    char key[50];
-    int value;
-    struct Key_value *next;
-} Key_value;
-
 
 
 #endif /* MEMORY_H */

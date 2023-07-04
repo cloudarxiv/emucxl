@@ -382,7 +382,7 @@ size_t emucxl_get_size(void* ptr)
 
 // Get the size of the allocated memory on the given numa node
 
-size_t emucxl_get_size_of_allocated_memory(int numa_node)
+size_t emucxl_stats(int numa_node)
 {
 	// Check for null pointers or zero size
 	if (numa_node < 0) {

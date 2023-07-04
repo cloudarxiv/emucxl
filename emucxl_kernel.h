@@ -4,26 +4,6 @@
 #include <linux/ioctl.h>
 #include <linux/types.h>
 
-// typedef struct
-// {
-// 	int status, dignity, ego;
-// } query_arg_t;
-
-// typedef struct
-// {
-// 	int size;
-// 	void* address;
-// 	int ret;
-// 	int numa_node;
-// } emucxl_arg_t;
-
-// typedef struct
-// {
-// 	int* address;
-// 	int index;
-// 	int value;
-// } emucxl_memory_t;
-
 typedef struct 
 { 
     int return_value;
@@ -45,6 +25,6 @@ typedef struct
 #define FIRST_MINOR 0
 #define MINOR_CNT 1
 #define LOCAL_MEMORY 0
-#define REMOTE_MEMORY 0
+#define REMOTE_MEMORY 1
 
 #endif
