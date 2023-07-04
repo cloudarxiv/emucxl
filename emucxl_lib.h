@@ -1,5 +1,5 @@
-#ifndef MEMCXLIB_LIB_H
-#define MEMCXLIB_LIB_H
+#ifndef EMUCXL_LIB_H
+#define EMUCXL_LIB_H
 
 #include <stddef.h>
 #include <stdio.h>
@@ -7,51 +7,51 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 #include <sys/types.h>
-#include "memcxlib_mmap.h"
+#include "emucxl_kernel.h"
 
-void memcxlib_init();
-void* memcxlib_alloc(size_t size, int node);
-void memcxlib_free(void* ptr, size_t size);
-void* memcxlib_resize(void* ptr, int node, size_t oldsize, size_t newsize);
-void* memcxlib_migrate(void* ptr, int newnode, size_t size);
-void memcxlib_exit();
+void emucxl_init();
+void* emucxl_alloc(size_t size, int node);
+void emucxl_free(void* ptr, size_t size);
+void* emucxl_resize(void* ptr, int node, size_t oldsize, size_t newsize);
+void* emucxl_migrate(void* ptr, int newnode, size_t size);
+void emucxl_exit();
 
 /* 
 * Extra API
 */
 
 // Read data from memory to buffer -> start_index is the index of the first byte to be read
-bool memcxlib_read(void* ptr, int start_index, void* buffer, size_t size);
+bool emucxl_read(void* ptr, int start_index, void* buffer, size_t size);
 
 // Write data from buffer to memory -> start_index is the index of the first byte to be written
-bool memcxlib_write(void* ptr, int start_index, void* buffer, size_t size);
+bool emucxl_write(void* ptr, int start_index, void* buffer, size_t size);
 
 // Memset 
-void* memcxlib_memset(void* ptr, int start_index, int value, size_t size);
+void* emucxl_memset(void* ptr, int start_index, int value, size_t size);
 
 // Memcpy
-void* memcxlib_memcpy(void* dest, const void* src, size_t size);
+void* emucxl_memcpy(void* dest, const void* src, size_t size);
 
 // Memmove
-void* memcxlib_memmove(void* dest, const void* src, size_t size);
+void* emucxl_memmove(void* dest, const void* src, size_t size);
 
 // Check if the memory address is local or remote
-bool memcxlib_is_local(void* ptr);
+bool emucxl_is_local(void* ptr);
 
 // Get the numa node of the memory address
-int memcxlib_get_numa_node(void* ptr);
+int emucxl_get_numa_node(void* ptr);
 
 // Get the size of the allocated memory
-size_t memcxlib_get_size(void* ptr);
+size_t emucxl_get_size(void* ptr);
 
 // Get the size of the allocated memory on a specific numa node
-size_t memcxlib_get_size_of_allocated_memory(int numa_node);
+size_t emucxl_get_size_of_allocated_memory(int numa_node);
 
 
 extern const char* dev_file;
 
 #define LOCAL_MEMORY 0
-#define REMOTE_MEMORY 1
+#define REMOTE_MEMORY 0
 #define PAGE_SIZE 4096
 
 typedef struct data

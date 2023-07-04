@@ -5,16 +5,16 @@
 #include <fcntl.h> // for open
 #include <unistd.h> // for close
 
-#include "memcxlib_lib.h"
+#include "emucxl_lib.h"
 int fd;
-const char* dev_file = "/dev/memcxlib";
+const char* dev_file = "/dev/emucxl";
 int reference_count = 0;
-data_t **data;
+data_t **g_data;
 
 
-void memcxlib_init()
+void emucxl_init()
 {
-    memcxlib_arg_t q;
+    emucxl_arg_t q;
 	if (reference_count == 0)
 	{
 		fd = open(dev_file, O_RDWR);
@@ -23,14 +23,14 @@ void memcxlib_init()
 			exit(EXIT_FAILURE);
 		}
 
-		data = dataAlloc();
+		g_data = dataAlloc();
 	}
 	reference_count++;
 	printf("DEBUG: INIT reference count : %d\n", reference_count);
 
-	if (ioctl(fd, MEMCXLIB_INIT, &q) < 0)
+	if (ioctl(fd, EMUCXL_INIT, &q) < 0)
 	{
-		perror("memcxlib ioctl allocate");
+		perror("emucxl ioctl allocate");
 	}
 	else
 	{
@@ -38,30 +38,30 @@ void memcxlib_init()
 	}
 }
 
-void memcxlib_exit()
+void emucxl_exit()
 {
-	if (ioctl(fd, MEMCXLIB_EXIT) < 0)
+	if (ioctl(fd, EMUCXL_EXIT) < 0)
 	{
-		perror("memcxlib ioctl exit");
+		perror("emucxl ioctl exit");
 	}
 	reference_count--;
 	printf("DEBUG: EXIT reference count : %d\n", reference_count);
 	if (reference_count <= 0) {
 		close(fd);
-		dataFree(data);
+		dataFree(g_data);
 	}
 }
 
-void* memcxlib_alloc(size_t size, int node)
+void* emucxl_alloc(size_t size, int node)
 {
 	unsigned char *p_map;
 	#ifdef DEBUG
-		memcxlib_lib_t q;
+		emucxl_lib_t q;
 		q.size = size;
 		q.numa_node = node;
-		if (ioctl(fd, MEMCXLIB_ALLOC, &q) == -1)
+		if (ioctl(fd, EMUCXL_ALLOC, &q) == -1)
 		{
-			perror("memcxlib ioctl allocate");
+			perror("emucxl ioctl allocate");
 		}
 	#endif
 
@@ -72,43 +72,43 @@ void* memcxlib_alloc(size_t size, int node)
         munmap(p_map, size);
 		return NULL;
     }
-	addItem(data, p_map, size, node);
+	addItem(g_data, p_map, size, node);
 	return (void*)p_map;
 }
 
-void memcxlib_free(void* ptr, size_t size)
+void emucxl_free(void* ptr, size_t size)
 {
 	munmap((unsigned char*)ptr, size);
 
 	#ifdef DEBUG
 		printf("hi2\n\n");
-		if (ioctl(fd, MEMCXLIB_FREE) < 0)
+		if (ioctl(fd, EMUCXL_FREE) < 0)
 		{
-			perror("memcxlib free allocate");
+			perror("emucxl free allocate");
 		}
 		printf("hi32\n\n");
 	#endif
-	deleteItem(data, ptr);
+	deleteItem(g_data, ptr);
 }
 
-void* memcxlib_resize(void* ptr, int node, size_t oldsize, size_t newsize)
+void* emucxl_resize(void* ptr, int node, size_t oldsize, size_t newsize)
 {
 	void* p_map;
-	p_map = memcxlib_alloc(newsize, node);
-	// copy data
+	p_map = emucxl_alloc(newsize, node);
+	// copy g_data
 	memmove(p_map, ptr, oldsize); // memmove is better store it in a temp buffer	and then copy it back. memcpy creates issue
 								// if the memory regions overlap.
-	memcxlib_free(ptr, oldsize); // issue data should not be changed
+	emucxl_free(ptr, oldsize); // issue data should not be changed
 	return p_map;
 }
 
-void* memcxlib_migrate(void* ptr, int newnode, size_t size)
+void* emucxl_migrate(void* ptr, int newnode, size_t size)
 {
 	void* p_map;
-	p_map = memcxlib_alloc(size, newnode);
+	p_map = emucxl_alloc(size, newnode);
 	// copy data
 	memmove(p_map, ptr, size);
-	memcxlib_free(ptr, size);
+	emucxl_free(ptr, size);
 	return p_map;
 }
 
@@ -117,7 +117,7 @@ void* memcxlib_migrate(void* ptr, int newnode, size_t size)
 */
 
 // Read data from memory to buffer
-bool memcxlib_read(void* ptr, int start_index, void* buffer, size_t size)
+bool emucxl_read(void* ptr, int start_index, void* buffer, size_t size)
 {
  // Check for null pointers or zero size
     if (ptr == NULL || buffer == NULL || size == 0) {
@@ -139,7 +139,7 @@ bool memcxlib_read(void* ptr, int start_index, void* buffer, size_t size)
 
 // Write data from buffer to memory
 
-bool memcxlib_write(void* ptr, int start_index, void* buffer, size_t size)
+bool emucxl_write(void* ptr, int start_index, void* buffer, size_t size)
 {
 	 // Check for null pointers or zero size
 	if (ptr == NULL || buffer == NULL || size == 0) {
@@ -161,7 +161,7 @@ bool memcxlib_write(void* ptr, int start_index, void* buffer, size_t size)
 
 // MEMSET
 // OK memset only works for setting 0 or -1
-void* memcxlib_memset(void* ptr, int start_index, int value, size_t size)
+void* emucxl_memset(void* ptr, int start_index, int value, size_t size)
 {
 	 // Check for null pointers or zero size
 	if (ptr == NULL || size == 0) {
@@ -181,7 +181,7 @@ void* memcxlib_memset(void* ptr, int start_index, int value, size_t size)
 }
 
 // MEMCPY
-void* memcxlib_memcpy(void* dest, const void* src, size_t size) {
+void* emucxl_memcpy(void* dest, const void* src, size_t size) {
     // Check for null pointers or zero size
     if (dest == NULL || src == NULL || size == 0) {
         return NULL;
@@ -198,7 +198,7 @@ void* memcxlib_memcpy(void* dest, const void* src, size_t size) {
 	return dest;
 }
 
-void* memcxlib_memmove(void* dest, const void* src, size_t size) {
+void* emucxl_memmove(void* dest, const void* src, size_t size) {
     // Check for null pointers or zero size
     if (dest == NULL || src == NULL || size == 0) {
         return NULL;
@@ -228,14 +228,14 @@ data_t **dataAlloc(void)
 	return malloc(sizeof(data_t)); // TODO: check if this is correct or not malloc(sizeof(data_t*));
 }
 
-void dataFree(data_t **data)
+void dataFree(data_t **g_data)
 {
-	free(data); // TODO: check if this is correct or not
+	free(g_data); // TODO: check if this is correct or not
 }
 
-void* getItem(data_t **data, void* address)
+void* getItem(data_t **g_data, void* address)
 {
-	data_t *temp = *data;
+	data_t *temp = *g_data;
 	while(temp != NULL)
 	{
 		if(temp->address == address)
@@ -247,9 +247,9 @@ void* getItem(data_t **data, void* address)
 	return NULL;
 }
 
-void deleteItem(data_t **data, void* address)
+void deleteItem(data_t **g_data, void* address)
 {
-	data_t *temp = *data;
+	data_t *temp = *g_data;
 	data_t *prev = NULL;
 	while(temp != NULL)
 	{
@@ -257,7 +257,7 @@ void deleteItem(data_t **data, void* address)
 		{
 			if(prev == NULL)
 			{
-				*data = temp->next;
+				*g_data = temp->next;
 			}
 			else
 			{
@@ -272,21 +272,21 @@ void deleteItem(data_t **data, void* address)
 }
 
 
-void addItem(data_t **data, void* address, int size, int numa_node)
+void addItem(data_t **g_data, void* address, int size, int numa_node)
 {
-	deleteItem(data, address);
+	deleteItem(g_data, address);
 	data_t *temp = malloc(sizeof(data_t));
 	temp->address = address;
 	temp->size = size;
 	temp->numa_node = numa_node;
-	temp->next = *data;
-	*data = temp;
+	temp->next = *g_data;
+	*g_data = temp;
 }
 
 
-size_t getSize(data_t **data, void* address)
+size_t getSize(data_t **g_data, void* address)
 {
-	data_t *temp = *data;
+	data_t *temp = *g_data;
 	while(temp != NULL)
 	{
 		if(temp->address == address)
@@ -298,9 +298,9 @@ size_t getSize(data_t **data, void* address)
 	return 0;
 }
 
-int getNumaNode(data_t **data, void* address)
+int getNumaNode(data_t **g_data, void* address)
 {
-	data_t *temp = *data;
+	data_t *temp = *g_data;
 	while(temp != NULL)
 	{
 		if(temp->address == address)
@@ -312,9 +312,9 @@ int getNumaNode(data_t **data, void* address)
 	return -1;
 }
 
-int getSizeOfAllocatedMemory(data_t **data, int numa_node)
+int getSizeOfAllocatedMemory(data_t **g_data, int numa_node)
 {
-	data_t *temp = *data;
+	data_t *temp = *g_data;
 	int size = 0;
 	while(temp != NULL)
 	{
@@ -329,7 +329,7 @@ int getSizeOfAllocatedMemory(data_t **data, int numa_node)
 
 
 // Check if the memory address is local or remote
-bool memcxlib_is_local(void* ptr)
+bool emucxl_is_local(void* ptr)
 {
 	// Check for null pointers or zero size
 	if (ptr == NULL) {
@@ -337,7 +337,7 @@ bool memcxlib_is_local(void* ptr)
 		return 0;
 	}
 
-	int numa_node = memcxlib_get_numa_node(ptr);
+	int numa_node = emucxl_get_numa_node(ptr);
 	if(numa_node == 0)
 	{
 		return 1;
@@ -346,7 +346,7 @@ bool memcxlib_is_local(void* ptr)
 }
 
 // Get the numa node of the memory address
-int memcxlib_get_numa_node(void* ptr)
+int emucxl_get_numa_node(void* ptr)
 {
 	// Check for null pointers or zero size
 	if (ptr == NULL) {
@@ -354,7 +354,7 @@ int memcxlib_get_numa_node(void* ptr)
 		return -1;
 	}
 
-	int numa_node = getNumaNode(data, ptr);
+	int numa_node = getNumaNode(g_data, ptr);
 	if(numa_node == -1)
 	{
 		return -1;
@@ -364,7 +364,7 @@ int memcxlib_get_numa_node(void* ptr)
 
 // Get the size of the memory address
 
-size_t memcxlib_get_size(void* ptr)
+size_t emucxl_get_size(void* ptr)
 {
 	// Check for null pointers or zero size
 	if (ptr == NULL) {
@@ -372,7 +372,7 @@ size_t memcxlib_get_size(void* ptr)
 		return 0;
 	}
 
-	size_t size = getSize(data, ptr);
+	size_t size = getSize(g_data, ptr);
 	if(size == 0)
 	{
 		return 0;
@@ -382,7 +382,7 @@ size_t memcxlib_get_size(void* ptr)
 
 // Get the size of the allocated memory on the given numa node
 
-size_t memcxlib_get_size_of_allocated_memory(int numa_node)
+size_t emucxl_get_size_of_allocated_memory(int numa_node)
 {
 	// Check for null pointers or zero size
 	if (numa_node < 0) {
@@ -390,7 +390,7 @@ size_t memcxlib_get_size_of_allocated_memory(int numa_node)
 		return 0;
 	}
 
-	size_t size = getSizeOfAllocatedMemory(data, numa_node);
+	size_t size = getSizeOfAllocatedMemory(g_data, numa_node);
 	if(size == 0)
 	{
 		return 0;
