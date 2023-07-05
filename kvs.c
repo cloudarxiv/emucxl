@@ -1,15 +1,14 @@
 #include "kvs.h"
 
-void kv_store_init(kv_store *kvs, int global_policy)
-{
+void kv_store_init(kv_store *kvs, int global_policy, uint32_t local_max, uint32_t remote_max) {
     kvs->local_head = NULL;
     kvs->local_tail = NULL;
     kvs->remote_head = NULL;
     kvs->remote_tail = NULL;
     kvs->local_size = 0;
     kvs->remote_size = 0;
-    kvs->local_max_size = LOCAL_MAX_SIZE;
-    kvs->remote_max_size = REMOTE_MAX_SIZE;
+    kvs->local_max_size = local_max;
+    kvs->remote_max_size = remote_max;
     kvs->policy = global_policy;
     emucxl_init();
     return;
@@ -62,7 +61,7 @@ kvs_pair* get_kv_pair(kv_store* kvs, char* key)
                 #endif
                 // put the node to the local list tail if the local list is not full
                 // else remove the node from tail and put it to remote list
-                if (kvs->local_size == LOCAL_MAX_SIZE )
+                if (kvs->local_size == kvs->local_max_size )
                 {
                     kvs_node* temp = kvs->local_tail;
                     // Remove the node from local tail

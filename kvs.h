@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdint.h>
 #include "emucxl_lib.h"
 
 #define MAX_KEY_LEN 100
@@ -21,16 +22,14 @@ typedef struct Node {
     struct Node* next;
 } kvs_node;
 
-#define LOCAL_MAX_SIZE 2
-#define REMOTE_MAX_SIZE 10
 #define FETCH_FROM_REMOTE_TO_LOCAL 1 // 1: fetch, 0: no fetch
 #define NO_FETCH 0
 
 typedef struct {
-    size_t local_size;
-    size_t local_max_size;
-    size_t remote_size;
-    size_t remote_max_size;
+    uint32_t local_size;
+    uint32_t local_max_size;
+    uint32_t remote_size;
+    uint32_t remote_max_size;
     kvs_node* local_head;
     kvs_node* local_tail;
     kvs_node* remote_head;
@@ -38,7 +37,7 @@ typedef struct {
     int policy; // 1: fetch from remote to local if not found in local, 0: no fetch
 } kv_store;
 
-void kv_store_init(kv_store* kvs, int global_policy);
+void kv_store_init(kv_store* kvs, int global_policy, uint32_t local_max, uint32_t remote_max);
 void kv_store_destroy(kv_store* kvs);
 
 void kv_store_put(kv_store* kvs, char* key, char* value);
