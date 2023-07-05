@@ -4,20 +4,20 @@ ifeq ($(KERNELRELEASE),)
 	KERNEL_SOURCE := /lib/modules/$(shell uname -r)/build
 	PWD := $(shell pwd)
 
-default: module emucxl_direct emucxl_app
+default: module direct_appl kvs_appl
 
 module:
 	make -C /lib/modules/$(shell uname -r)/build M=$(shell pwd) modules
 
-emucxl_direct: emucxl_direct.c emucxl_lib.c emucxl_lib.h
-	gcc -o emucxl_direct emucxl_direct.c emucxl_lib.c
+direct_appl: direct_appl.c emucxl_lib.c emucxl_lib.h
+	gcc -o direct_appl direct_appl.c emucxl_lib.c
 
-emucxl_app: emucxl_app.c emucxl_lib.c emucxl_kv.c emucxl_lib.h emucxl_kv.h
-	gcc -o emucxl_app emucxl_app.c emucxl_lib.c emucxl_kv.c
+kvs_appl: kvs_appl.c emucxl_lib.c kvs.c emucxl_lib.h kvs.h
+	gcc -o kvs_appl kvs_appl.c emucxl_lib.c kvs.c
 
 clean:
 	make -C /lib/modules/$(shell uname -r)/build M=$(shell pwd) clean
-	${RM} emucxl_lib emucxl_direct emucxl_app
+	${RM} emucxl_lib direct_appl kvs_appl
 
 # Otherwise KERNELRELEASE is defined; we've been invoked from the
 # kernel build system and can use its language.

@@ -1,11 +1,11 @@
 #! /bin/bash
 
-make clean
-make
+make clean > /dev/null
+make > /dev/null 2>/dev/null
 sudo insmod emucxl_kernel.ko
-# sudo ./emucxl_direct &
+# sudo ./direct_appl &
 # sleep 1
-sudo ./emucxl_direct
-sudo ./emucxl_app
+sudo ./direct_appl
+sudo ./kvs_appl
 sudo rmmod emucxl_kernel
-sudo dmesg | tail -20
+# sudo dmesg | tail -20
