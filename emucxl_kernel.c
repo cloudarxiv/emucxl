@@ -33,8 +33,10 @@ static dev_t dev;
 static struct cdev c_dev;
 static struct class *cl;
 
-static unsigned char *buffer;
-static unsigned char array[10]={0,1,2,3,4,5,6,7,8,9};
+#ifdef DEBUG
+	static unsigned char *buffer1;
+	static unsigned char array[10]={0,1,2,3,4,5,6,7,8,9};
+#endif
 
 /* Open*/
 static int my_open(struct inode *i, struct file *f)
@@ -54,7 +56,8 @@ static int my_mmap(struct file *filp, struct vm_area_struct *vma)
 	phys_addr_t phys_addr;
 	pid_t pid;
     unsigned long page;
-    unsigned char i;
+    unsigned long i;
+	unsigned char *buffer;
     unsigned long start = (unsigned long)vma->vm_start;
     unsigned long size = (unsigned long)(vma->vm_end - vma->vm_start);
 	unsigned long node = vma->vm_pgoff << PAGE_SHIFT >> PAGE_SHIFT;
@@ -68,16 +71,22 @@ static int my_mmap(struct file *filp, struct vm_area_struct *vma)
 	}
 	pr_info("NUMA_NODE: %ld \t Virtual Address: 0x%px \t Physical Address: 0x%llx \n", node, (void*)buffer, phys_addr);
 	printk(KERN_INFO "address = 0x%p\n", (void*)buffer);
-	SetPageReserved(virt_to_page(buffer));  // set this page as reserved.
 
+	for(i=0; i < size; i+= PAGE_SIZE)
+	{
+		SetPageReserved(virt_to_page(buffer + i));  // set this page as reserved.
+	}
+
+	// SetPageReserved(virt_to_page(buffer));  // set this page as reserved.
 
     page = virt_to_phys(buffer); // get the physical address from virtual.
     if(remap_pfn_range(vma, start, page>>PAGE_SHIFT, size, PAGE_SHARED))
         return -1;
 
-    for(i=0; i<10; i++)  // write some data
-        buffer[i] = array[i] * i;
-
+	#ifdef DEBUG
+		for(i=0; i<10; i++)  // write some data
+			buffer1[i] = array[i] * i;
+	#endif
     return 0;
 }
 
@@ -129,7 +138,7 @@ static long my_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
 					return -EACCES;
 				}
 				numa_node = nod.numa_node;
-				buffer = (unsigned char *)kmalloc_node(nod.size, GFP_USER | __GFP_ZERO, numa_node);  // alloc some mem.
+				buffer1 = (unsigned char *)kmalloc_node(nod.size, GFP_USER | __GFP_ZERO, numa_node);  // alloc some mem.
 				phys_addr = virt_to_phys((void *)buffer);
 				if (!phys_addr) {
 					pr_alert("Error: Virtual Address 0x%p of PID: %d does not exist... \n", (void*)buffer, pid);

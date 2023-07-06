@@ -26,15 +26,12 @@ void emucxl_init()
 		g_data = dataAlloc();
 	}
 	reference_count++;
+#ifdef DEBUG
 	printf("DEBUG: INIT reference count : %d\n", reference_count);
-
+#endif
 	if (ioctl(fd, EMUCXL_INIT, &q) < 0)
 	{
 		perror("emucxl ioctl allocate");
-	}
-	else
-	{
-		printf("DEBUG: return value(0 means success) : %d\n", q.return_value);
 	}
 }
 
@@ -45,7 +42,9 @@ void emucxl_exit()
 		perror("emucxl ioctl exit");
 	}
 	reference_count--;
+	#ifdef DEBUG
 	printf("DEBUG: EXIT reference count : %d\n", reference_count);
+	#endif
 	if (reference_count <= 0) {
 		close(fd);
 		dataFree(g_data);
@@ -63,8 +62,8 @@ void* emucxl_alloc(size_t size, int node)
 		{
 			perror("emucxl ioctl allocate");
 		}
+		printf("DEBUG: size : %ld\n", size);
 	#endif
-
     p_map = (unsigned char *)mmap(0, size, PROT_READ | PROT_WRITE,
             MAP_SHARED, fd, node * PAGE_SIZE); // offset should be in multiple of page size
     if(p_map == MAP_FAILED) {

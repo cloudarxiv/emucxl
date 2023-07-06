@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/mman.h>
+#include <time.h>
 
 #include "emucxl_lib.h"
 #define LOCAL_MEMORY 0
@@ -17,14 +18,15 @@ struct node
 struct Queue
 {
     int count;
+    int policy;
     struct node *front;
     struct node *rear;
 };
 
-struct node* createNode(int data)
+struct node* createNode(struct Queue *que, int data)
 {
     struct node *newnode;
-    newnode = (struct node*)emucxl_alloc(sizeof(struct node), LOCAL_MEMORY);
+    newnode = (struct node*)emucxl_alloc(sizeof(struct node), que->policy);
     if(newnode == NULL)
     {
         printf("alloc failed\n");
@@ -39,13 +41,14 @@ struct node* createNode(int data)
 }
 
 
-struct Queue* createQueue()
+struct Queue* createQueue(int flag) // flag = 0 for local memory, flag = 1 for remote memory
 {
-    struct Queue *que = (struct Queue*)emucxl_alloc(sizeof(struct Queue), LOCAL_MEMORY);
+    struct Queue *que = (struct Queue*)emucxl_alloc(sizeof(struct Queue), flag ? REMOTE_MEMORY : LOCAL_MEMORY);
     if(!que)
         return NULL;
     que->front = que->rear = NULL;
     que->count = 0;
+    que->policy = flag ? REMOTE_MEMORY : LOCAL_MEMORY;
     return que;
 }
  
@@ -70,7 +73,7 @@ void queueSize(struct Queue *que)
 }
 void enqueue(struct Queue *que, int data)
 {
-    struct node *newnode = createNode(data);
+    struct node *newnode = createNode(que, data);
     if((que->front == NULL) && (que->rear == NULL))
     {
         que->front = que->rear = newnode;
@@ -82,7 +85,7 @@ void enqueue(struct Queue *que, int data)
     que->count++;
     return;
 }
-int dequeue(struct Queue *que)
+void dequeue(struct Queue *que)
 {
     struct node *temp;
     if((que->front == NULL) && (que->rear == NULL))
@@ -127,57 +130,101 @@ void queueDestroy(struct Queue *que)
     que->count = 0;
     que->front = que->rear = NULL;
     emucxl_free(que, sizeof(struct Queue));
+#ifdef DEBUG
     printf("Queue destroyed\n");
+#endif
+}
+
+void testCase(struct Queue *que, int num_enq, int num_deque, int num_enq_next, const char *test_name)
+{
+#ifdef DEBUG
+    printf("DEBUG: Queue created\n");
+    printf("Check Queue is empty or not: "); queueEmpty(que);
+    printf("Queue state: "); queueDisplay(que);
+    printf("Queue: Enqueue 20 elements\n");
+#endif
+    clock_t start, end;
+    double cpu_time_used;
+    start = clock();
+    for(int i = 0; i < num_enq; i++) {
+        enqueue(que, i*2);
+    }
+#ifdef DEBUG
+    printf("%s_Time_Enqueue: %f\n", test_name, cpu_time_used);
+    printf("Queue state: "); queueDisplay(que);
+    printf("Queue size: %d\n", que->count);
+    printf("Queue front: %d\n", queueFrontElement(que));
+    printf("Queue: Dequeue 5 elements\n");
+#endif
+    start = clock();
+    for(int i = 0; i < num_deque; i++) {
+        dequeue(que);
+    }
+#ifdef DEBUG
+    printf("%s_Time_Dequeue: %f\n", test_name, cpu_time_used);
+    printf("Queue: front: %d\n", queueFrontElement(que));
+    printf("Queue: "); queueDisplay(que);
+    printf("Check Queue is empty or not: "); queueEmpty(que);
+    printf("Queue: Enqueue 10 elements\n");
+#endif
+    for (int i = 0; i < num_enq_next; i++) {
+        enqueue(que, i*2 + num_enq*2);
+    }
+    end = clock();
+    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+    printf("%s_Time: %f\n", test_name, cpu_time_used);
+#ifdef DEBUG
+    printf("%s_Time_Next_Enqueue: %f\n", test_name, cpu_time_used);
+    printf("Queue size: %d\n", que->count);
+    printf("Queue: "); queueSize(que);
+    printf("Queue state: "); queueDisplay(que);
+#endif
 }
 
 
 int main(int argc , char *argv[])
 {
     emucxl_init();
-
-    struct Queue *que = createQueue();
-    if(que == NULL)
+    for(int i= 1; i < 6; i++)
     {
-        printf("Queue creation failed\n");
+#ifdef DEBUG
+    printf("DEBUG: LOCAL OBJECT\n");
+#endif
+    struct Queue *que = createQueue(LOCAL_MEMORY);
+    if(que == NULL)
+    {   
+        #ifdef DEBUG
+        printf("DEBUG: Queue creation failed\n");
+        #endif
+        emucxl_exit();
         return 0;
     }
-    printf("DEBUG: Queue created\n");
-    printf("Check Queue is empty or not: "); queueEmpty(que);
-    printf("Queue state: "); queueDisplay(que);
-
-    printf("Queue: Enqueue 20 elements\n");
-    for(int i = 0; i < 20; i++) {
-        enqueue(que, i*10);
-    }
-
-    printf("Queue state: "); queueDisplay(que);
-    printf("Queue size: %d\n", que->count);
-
-    printf("Queue front: %d\n", queueFrontElement(que));
-
-    printf("Queue: Dequeue 5 elements\n");
-    for(int i = 0; i < 5; i++) {
-        dequeue(que);
-    }
-
-    printf("Queue: front: %d\n", queueFrontElement(que));
-
-    printf("Queue: "); queueDisplay(que);
-
-    printf("Check Queue is empty or not: "); queueEmpty(que);
-
-    printf("Queue: Enqueue 10 elements\n");
-    for (int i = 0; i < 10; i++) {
-        enqueue(que, i*10 + 200);
-    }
-
-    printf("Queue: "); queueSize(que);
-
-    printf("Queue state: "); queueDisplay(que);
-
+    int num = 10000*i;
+    int num_deque = num*0.6;
+    int num_enq_next = num*0.6;
+    printf("Test: %d %d %d\n", num, num_deque, num_enq_next);
+    testCase(que, num, num_deque, num_enq_next, "Local");
+#ifdef DEBUG
+    printf("DEBUG: REMOTE OBJECT\n");
+#endif
     queueDestroy(que);
+    struct Queue *que_remote = createQueue(REMOTE_MEMORY);
+    if (que_remote == NULL)
+    {   
+        #ifdef DEBUG
+        printf("DEBUG: Queue creation failed\n");
+        #endif
+        queueDestroy(que);
+        emucxl_exit();
+        return 0;
+    }
+    testCase(que_remote, num, num_deque, num_enq_next, "Remote");
+    queueDestroy(que_remote);
+    }
 
     emucxl_exit();
+#ifdef DEBUG
     printf("DEBUG: Queue cleanup and deleted and exited from emucxl\n");
+#endif
     return 0;
 }
