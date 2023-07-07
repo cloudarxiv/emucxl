@@ -1,15 +1,15 @@
 Test: 10000 6000 6000
-Local_Time: 0.347433
-Remote_Time: 0.400386
+Local_Time: 0.347028
+Remote_Time: 0.401003
 Test: 20000 12000 12000
-Local_Time: 1.272456
-Remote_Time: 1.428677
+Local_Time: 1.329999
+Remote_Time: 1.502336
 Test: 30000 18000 18000
-Local_Time: 2.912710
-Remote_Time: 3.208010
+Local_Time: 2.997193
+Remote_Time: 3.206650
 Test: 40000 24000 24000
-Local_Time: 5.373948
-Remote_Time: 5.715336
+Local_Time: 5.482053
+Remote_Time: 5.929728
 Test: 50000 30000 30000
-Local_Time: 8.612376
-Remote_Time: 8.864077
+Local_Time: 9.048944
+Remote_Time: 9.281935
