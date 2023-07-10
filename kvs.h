@@ -11,6 +11,8 @@
 #define MAX_KEY_LEN 100
 #define MAX_VALUE_LEN 100
 
+enum {GET, PUT, DELETE};
+
 typedef struct {
     char key[MAX_KEY_LEN + 1]; // +1 for '\0'
     char value[MAX_VALUE_LEN + 1]; // +1 for '\0'
@@ -35,6 +37,8 @@ typedef struct {
     kvs_node* remote_head;
     kvs_node* remote_tail;
     int policy; // 1: fetch from remote to local if not found in local, 0: no fetch
+    u_int32_t local_fetch_count;
+    u_int32_t remote_fetch_count;
 } kv_store;
 
 void kv_store_init(kv_store* kvs, int global_policy, uint32_t local_max, uint32_t remote_max);
