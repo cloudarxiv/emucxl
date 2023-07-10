@@ -1,0 +1,35 @@
+Running seed 1
+Testcase with policy 1
+Local fetch count:	 11964
+Remote fetch count:	 28036
+Testcase with policy 0
+Local fetch count:	 12008
+Remote fetch count:	 27992
+Running seed 10
+Testcase with policy 1
+Local fetch count:	 12196
+Remote fetch count:	 27804
+Testcase with policy 0
+Local fetch count:	 12056
+Remote fetch count:	 27944
+Running seed 25
+Testcase with policy 1
+Local fetch count:	 11874
+Remote fetch count:	 28126
+Testcase with policy 0
+Local fetch count:	 11918
+Remote fetch count:	 28082
+Running seed 37
+Testcase with policy 1
+Local fetch count:	 11989
+Remote fetch count:	 28011
+Testcase with policy 0
+Local fetch count:	 11988
+Remote fetch count:	 28012
+Running seed 45
+Testcase with policy 1
+Local fetch count:	 12045
+Remote fetch count:	 27955
+Testcase with policy 0
+Local fetch count:	 12078
+Remote fetch count:	 27922

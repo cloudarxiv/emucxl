@@ -12,7 +12,7 @@ module:
 direct_queue: direct_queue.c emucxl_lib.c emucxl_lib.h
 	gcc -o direct_queue direct_queue.c emucxl_lib.c
 
-kvs_appl: kvs_testcase.c emucxl_lib.c kvs.c emucxl_lib.h kvs.h
+kvs_testcase: kvs_testcase.c emucxl_lib.c kvs.c emucxl_lib.h kvs.h
 	gcc -o kvs_testcase kvs_testcase.c emucxl_lib.c kvs.c
 
 kvs_appl: kvs_appl.c emucxl_lib.c kvs.c emucxl_lib.h kvs.h

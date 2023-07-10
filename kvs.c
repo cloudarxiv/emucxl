@@ -53,10 +53,13 @@ kvs_pair* get_kv_pair(kv_store* kvs, char* key, int ops)
                 if (kvs->local_size == kvs->local_max_size )
                 {
                     kvs_node* temp = kvs->local_tail;
-                    kvs->local_tail->prev->next = NULL;
+                    if (kvs->local_tail->prev != NULL)
+                        kvs->local_tail->prev->next = NULL;
+                    else 
+                        kvs->local_head = NULL;
+
                     kvs->local_tail = kvs->local_tail->prev;
                     kvs->local_size--;
-                      
                     kvs_node* new_node = (kvs_node*)emucxl_alloc(sizeof(kvs_node), REMOTE_MEMORY);
                     new_node->kv_pair = (kvs_pair*)emucxl_alloc(sizeof(kvs_pair), REMOTE_MEMORY);
                     strcpy(new_node->kv_pair->key, temp->kv_pair->key);
@@ -64,13 +67,14 @@ kvs_pair* get_kv_pair(kv_store* kvs, char* key, int ops)
                     
                     new_node->prev = NULL;
                     new_node->next = kvs->remote_head;
-
-                    kvs->remote_head->prev = new_node;
+                    if (kvs->remote_head != NULL)
+                          kvs->remote_head->prev = new_node;
                     kvs->remote_head = new_node;
                     kvs->remote_size++;
                     
                     emucxl_free((void*)temp->kv_pair, sizeof(kvs_pair));
                     emucxl_free((void*)temp, sizeof(kvs_node));
+                    
                 }
 
                 if(curr->prev != NULL)
@@ -93,9 +97,11 @@ kvs_pair* get_kv_pair(kv_store* kvs, char* key, int ops)
                 new_node->kv_pair = (kvs_pair*)emucxl_alloc(sizeof(kvs_pair), LOCAL_MEMORY);
                 strcpy(new_node->kv_pair->key, curr->kv_pair->key);
                 strcpy(new_node->kv_pair->value, curr->kv_pair->value);
+                
                 new_node->prev = kvs->local_tail;
                 new_node->next = NULL;
-                kvs->local_tail->next = new_node;
+                if (kvs->local_tail != NULL)
+                     kvs->local_tail->next = new_node;
                 kvs->local_tail = new_node;
                 kvs->local_size++;
 
@@ -212,7 +218,7 @@ void kv_store_delete(kv_store* kvs, char* key) {
             // free(curr->kv_pair);
             // free(curr);
             emucxl_free((void*)curr->kv_pair, sizeof(kvs_pair));
-            emucxl_free(curr, sizeof(kvs_node));
+            emucxl_free((void*)curr, sizeof(kvs_node));
             return;
         }
         curr = curr->next;
@@ -240,8 +246,8 @@ void kv_store_delete(kv_store* kvs, char* key) {
             kvs->remote_size -= 1;
 
             // Free the node
-            free(curr->kv_pair);
-            free(curr);
+            emucxl_free((void*)curr->kv_pair, sizeof(kvs_pair));
+            emucxl_free((void*)curr, sizeof(kvs_node));
             return;
         }
         curr = curr->next;
