@@ -1,35 +1,92 @@
-Running seed 1
+Policy 1: Fetch object to local if it is in remote
+Policy 0: Keep object in remote if it is in remote
+x = 0
 Testcase with policy 1
-Local fetch count:	 11964
-Remote fetch count:	 28036
+Local fetch count:	 14896
+Remote fetch count:	 35104
+Random get requests done
 Testcase with policy 0
-Local fetch count:	 12008
-Remote fetch count:	 27992
-Running seed 10
+Local fetch count:	 15009
+Remote fetch count:	 34991
+Random get requests done
+x = 10
 Testcase with policy 1
-Local fetch count:	 12196
-Remote fetch count:	 27804
+Local fetch count:	 40687
+Remote fetch count:	 9313
+10% object gets 90% get requests done
 Testcase with policy 0
-Local fetch count:	 12056
-Remote fetch count:	 27944
-Running seed 25
+Local fetch count:	 1645
+Remote fetch count:	 48355
+10% object gets 90% get requests done
+x = 20
 Testcase with policy 1
-Local fetch count:	 11874
-Remote fetch count:	 28126
+Local fetch count:	 25475
+Remote fetch count:	 24525
+20% object gets 90% get requests done
 Testcase with policy 0
-Local fetch count:	 11918
-Remote fetch count:	 28082
-Running seed 37
+Local fetch count:	 1887
+Remote fetch count:	 48113
+20% object gets 90% get requests done
+x = 30
 Testcase with policy 1
-Local fetch count:	 11989
-Remote fetch count:	 28011
+Local fetch count:	 14293
+Remote fetch count:	 35707
+30% object gets 90% get requests done
 Testcase with policy 0
-Local fetch count:	 11988
-Remote fetch count:	 28012
-Running seed 45
+Local fetch count:	 2143
+Remote fetch count:	 47857
+30% object gets 90% get requests done
+x = 40
 Testcase with policy 1
-Local fetch count:	 12045
-Remote fetch count:	 27955
+Local fetch count:	 9016
+Remote fetch count:	 40984
+40% object gets 90% get requests done
 Testcase with policy 0
-Local fetch count:	 12078
-Remote fetch count:	 27922
+Local fetch count:	 2471
+Remote fetch count:	 47529
+40% object gets 90% get requests done
+x = 50
+Testcase with policy 1
+Local fetch count:	 7436
+Remote fetch count:	 42564
+50% object gets 90% get requests done
+Testcase with policy 0
+Local fetch count:	 2972
+Remote fetch count:	 47028
+50% object gets 90% get requests done
+x = 60
+Testcase with policy 1
+Local fetch count:	 6339
+Remote fetch count:	 43661
+60% object gets 90% get requests done
+Testcase with policy 0
+Local fetch count:	 3785
+Remote fetch count:	 46215
+60% object gets 90% get requests done
+x = 70
+Testcase with policy 1
+Local fetch count:	 6342
+Remote fetch count:	 43658
+70% object gets 90% get requests done
+Testcase with policy 0
+Local fetch count:	 5000
+Remote fetch count:	 45000
+70% object gets 90% get requests done
+x = 80
+Testcase with policy 1
+Local fetch count:	 11113
+Remote fetch count:	 38887
+80% object gets 90% get requests done
+Testcase with policy 0
+Local fetch count:	 10588
+Remote fetch count:	 39412
+80% object gets 90% get requests done
+x = 90
+Testcase with policy 1
+Local fetch count:	 15216
+Remote fetch count:	 34784
+90% object gets 90% get requests done
+Testcase with policy 0
+Local fetch count:	 14978
+Remote fetch count:	 35022
+90% object gets 90% get requests done
