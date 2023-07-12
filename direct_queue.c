@@ -217,7 +217,7 @@ int main(int argc , char *argv[])
         emucxl_exit();
         return 0;
     }
-    int num = 30000;
+    int num = 15000;
     printf("Number of elements: %d enqueue followed by dequeue\n", num);
     testCase2(que, num, "Local");
 #ifdef DEBUG
