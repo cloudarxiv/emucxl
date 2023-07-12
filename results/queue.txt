@@ -1,19 +1,60 @@
 Running experiments 1
-Number of elements: 30000 enqueue followed by dequeue
-Local_Enque_Time: 1833.47
-Local_Deque_Time: 1531.55
-Remote_Enque_Time: 2173.91
-Remote_Deque_Time: 1897.19
+Number of elements: 15000 enqueue followed by dequeue
+Local_Enque_Time: 494.73
+Local_Deque_Time: 419.08
+Remote_Enque_Time: 563.50
+Remote_Deque_Time: 501.69
 Running experiments 2
-Number of elements: 30000 enqueue followed by dequeue
-Local_Enque_Time: 1895.09
-Local_Deque_Time: 1530.49
-Remote_Enque_Time: 2224.11
-Remote_Deque_Time: 1906.26
+Number of elements: 15000 enqueue followed by dequeue
+Local_Enque_Time: 496.53
+Local_Deque_Time: 433.26
+Remote_Enque_Time: 560.80
+Remote_Deque_Time: 509.79
 Running experiments 3
-Number of elements: 30000 enqueue followed by dequeue
-Local_Enque_Time: 2208.40
-Local_Deque_Time: 1549.31
-Remote_Enque_Time: 2081.36
-Remote_Deque_Time: 1913.55
+Number of elements: 15000 enqueue followed by dequeue
+Local_Enque_Time: 494.23
+Local_Deque_Time: 419.31
+Remote_Enque_Time: 563.60
+Remote_Deque_Time: 499.74
 Running experiments 4
+Number of elements: 15000 enqueue followed by dequeue
+Local_Enque_Time: 497.74
+Local_Deque_Time: 408.11
+Remote_Enque_Time: 561.75
+Remote_Deque_Time: 501.35
+Running experiments 5
+Number of elements: 15000 enqueue followed by dequeue
+Local_Enque_Time: 515.69
+Local_Deque_Time: 421.92
+Remote_Enque_Time: 567.26
+Remote_Deque_Time: 498.78
+Running experiments 6
+Number of elements: 15000 enqueue followed by dequeue
+Local_Enque_Time: 503.71
+Local_Deque_Time: 409.41
+Remote_Enque_Time: 564.25
+Remote_Deque_Time: 499.55
+Running experiments 7
+Number of elements: 15000 enqueue followed by dequeue
+Local_Enque_Time: 503.55
+Local_Deque_Time: 423.23
+Remote_Enque_Time: 563.56
+Remote_Deque_Time: 497.77
+Running experiments 8
+Number of elements: 15000 enqueue followed by dequeue
+Local_Enque_Time: 506.00
+Local_Deque_Time: 408.18
+Remote_Enque_Time: 565.20
+Remote_Deque_Time: 496.89
+Running experiments 9
+Number of elements: 15000 enqueue followed by dequeue
+Local_Enque_Time: 521.32
+Local_Deque_Time: 425.47
+Remote_Enque_Time: 575.85
+Remote_Deque_Time: 500.66
+Running experiments 10
+Number of elements: 15000 enqueue followed by dequeue
+Local_Enque_Time: 496.25
+Local_Deque_Time: 408.98
+Remote_Enque_Time: 586.37
+Remote_Deque_Time: 497.83
