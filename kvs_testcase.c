@@ -29,7 +29,7 @@ int main(int argc, char *argv[]){
     if (x == 0)
     {
         // random get requests
-        for (int i = 0; i < 50000; i++) {
+        for (int i = 1; i <= 50000; i++) {
             int num = (rand() % 1000 + 1);
             char key[10];
             sprintf(key, "key%d", num);
@@ -40,6 +40,7 @@ int main(int argc, char *argv[]){
         }
         printf("Local fetch count:\t %d\n", store.local_fetch_count);
         printf("Remote fetch count:\t %d\n", store.remote_fetch_count);
+        printf("Local percentage:\t %.2f\n", ((int)(100 * (float)store.local_fetch_count / (store.local_fetch_count + store.remote_fetch_count) * 100)) / 100.0);
         printf("Random get requests done\n");
     }
     else
@@ -58,7 +59,7 @@ int main(int argc, char *argv[]){
 
         // other 10% get requests
         for (int i = 1; i <= 5000; i++) {
-            int num = (rand() % (1000 - k) + (k + 1));
+            int num = (rand() % (1000 - k)) + (k + 1);
             char key[10];
             sprintf(key, "key%d", num);
             const char* value = kv_store_get(&store, key);
@@ -68,6 +69,7 @@ int main(int argc, char *argv[]){
         }
         printf("Local fetch count:\t %d\n", store.local_fetch_count);
         printf("Remote fetch count:\t %d\n", store.remote_fetch_count);
+        printf("Local percentage:\t %.2f\n", ((int)(100 * (float)store.local_fetch_count / (store.local_fetch_count + store.remote_fetch_count) * 100)) / 100.0);
         printf("%d%% object gets 90%% get requests done\n", x);
     }
 

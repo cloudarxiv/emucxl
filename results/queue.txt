@@ -1,0 +1,19 @@
+Running experiments 1
+Number of elements: 30000 enqueue followed by dequeue
+Local_Enque_Time: 1833.47
+Local_Deque_Time: 1531.55
+Remote_Enque_Time: 2173.91
+Remote_Deque_Time: 1897.19
+Running experiments 2
+Number of elements: 30000 enqueue followed by dequeue
+Local_Enque_Time: 1895.09
+Local_Deque_Time: 1530.49
+Remote_Enque_Time: 2224.11
+Remote_Deque_Time: 1906.26
+Running experiments 3
+Number of elements: 30000 enqueue followed by dequeue
+Local_Enque_Time: 2208.40
+Local_Deque_Time: 1549.31
+Remote_Enque_Time: 2081.36
+Remote_Deque_Time: 1913.55
+Running experiments 4

@@ -181,12 +181,30 @@ void testCase(struct Queue *que, int num_enq, int num_deque, int num_enq_next, c
 #endif
 }
 
+void testCase2(struct Queue *que, int num, const char *test_name)
+{
+    clock_t start, end;
+    double cpu_time_used;
+    start = clock();
+    for(int i = 0; i < num; i++) {
+        enqueue(que, i*2);
+    }
+    end = clock();
+    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+    printf("%s_Enque_Time: %.2f\n", test_name, cpu_time_used * 1000.0);
+    start = clock();
+    for(int i = 0; i < num; i++) {
+        dequeue(que);
+    }
+    end = clock();
+    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+    printf("%s_Deque_Time: %.2f\n", test_name, cpu_time_used * 1000.0);
+}
+
 
 int main(int argc , char *argv[])
 {
     emucxl_init();
-    for(int i= 1; i < 6; i++)
-    {
 #ifdef DEBUG
     printf("DEBUG: LOCAL OBJECT\n");
 #endif
@@ -199,11 +217,9 @@ int main(int argc , char *argv[])
         emucxl_exit();
         return 0;
     }
-    int num = 10000*i;
-    int num_deque = num*0.6;
-    int num_enq_next = num*0.6;
-    printf("Test: %d %d %d\n", num, num_deque, num_enq_next);
-    testCase(que, num, num_deque, num_enq_next, "Local");
+    int num = 30000;
+    printf("Number of elements: %d enqueue followed by dequeue\n", num);
+    testCase2(que, num, "Local");
 #ifdef DEBUG
     printf("DEBUG: REMOTE OBJECT\n");
 #endif
@@ -218,9 +234,8 @@ int main(int argc , char *argv[])
         emucxl_exit();
         return 0;
     }
-    testCase(que_remote, num, num_deque, num_enq_next, "Remote");
+    testCase2(que_remote, num, "Remote");
     queueDestroy(que_remote);
-    }
 
     emucxl_exit();
 #ifdef DEBUG
