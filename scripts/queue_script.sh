@@ -6,7 +6,7 @@ sudo insmod emucxl_kernel.ko
 for i in {1..10}
 do
     echo "Run $i"
-    sudo ./direct_queue
+    sudo ../src/direct_queue
 done
 
 sudo rmmod emucxl_kernel
