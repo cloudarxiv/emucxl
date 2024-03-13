@@ -1,9 +1,10 @@
 #! /bin/bash
-
+cd ../src
 make clean > /dev/null
 make > /dev/null 2>/dev/null
-sudo insmod ../src/emucxl_kernel.ko
 
+sudo insmod emucxl_kernel.ko
+cd ../scripts
 echo "Policy 1: Move the object from remote memory to local memory if it is currently in remote memory." 
 echo "Policy 0: Keep the object in remote memory if it is currently in remote memory."
 
@@ -15,4 +16,4 @@ do
     echo "Policy 0"
     sudo ../src/kvs_testcase 0 1 $i # 0: policy, 1: seed value, $i: percentage of get requests
 done
-sudo rmmod ../src/emucxl_kernel
+sudo rmmod emucxl_kernel
