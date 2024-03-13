@@ -6,7 +6,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdint.h>
-#include "../src/emucxl_lib.h"
+#include "emucxl_lib.h"
 
 #define MAX_KEY_LEN 100
 #define MAX_VALUE_LEN 100

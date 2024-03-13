@@ -4,7 +4,7 @@
 #include <string.h>
 #include <sys/mman.h>
 
-#include "../src/emucxl_lib.h"
+#include "emucxl_lib.h"
 
 int main(int argc , char *argv[])
 {

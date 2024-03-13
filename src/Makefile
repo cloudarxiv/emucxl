@@ -7,16 +7,16 @@ ifeq ($(KERNELRELEASE),)
 default: module direct_queue kvs_appl kvs_testcase
 
 module:
-	make -C /lib/modules/$(shell uname -r)/build M=$(shell pwd)/src modules
+	make -C /lib/modules/$(shell uname -r)/build M=$(shell pwd) modules
 
-direct_queue: experiments/direct_queue.c src/emucxl_lib.c src/emucxl_lib.h  
-	gcc -o direct_queue experiments/direct_queue.c src/emucxl_lib.c  
+direct_queue: direct_queue.c emucxl_lib.c emucxl_lib.h  
+	gcc -o direct_queue direct_queue.c emucxl_lib.c  
   
-kvs_testcase: experiments/kvs_testcase.c src/emucxl_lib.c src/kvs.c src/emucxl_lib.h src/kvs.h  
-	gcc -o kvs_testcase experiments/kvs_testcase.c src/emucxl_lib.c src/kvs.c  
+kvs_testcase: kvs_testcase.c emucxl_lib.c kvs.c emucxl_lib.h kvs.h  
+	gcc -o kvs_testcase kvs_testcase.c emucxl_lib.c kvs.c  
   
-kvs_appl: experiments/kvs_appl.c src/emucxl_lib.c src/kvs.c src/emucxl_lib.h src/kvs.h  
-	gcc -o kvs_appl experiments/kvs_appl.c src/emucxl_lib.c src/kvs.c 
+kvs_appl: kvs_appl.c emucxl_lib.c kvs.c emucxl_lib.h kvs.h  
+	gcc -o kvs_appl kvs_appl.c emucxl_lib.c kvs.c 
 
 clean:
 	make -C /lib/modules/$(shell uname -r)/build M=$(shell pwd) clean

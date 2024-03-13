@@ -5,7 +5,7 @@
 #include <sys/mman.h>
 #include <time.h>
 
-#include "../src/emucxl_lib.h"
+#include "emucxl_lib.h"
 #define LOCAL_MEMORY 0
 #define REMOTE_MEMORY 1
 

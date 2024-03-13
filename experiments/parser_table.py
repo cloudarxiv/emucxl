@@ -4,7 +4,7 @@ import re
 import statistics
 
 # Read text from file
-with open("results/queue_results.txt", "r") as file:
+with open("../results/queue_results.txt", "r") as file:
     text = file.read()
 
 # Extract experiment number, enqueue time, and dequeue time using regular expressions
