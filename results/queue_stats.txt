@@ -1,0 +1,4 @@
+	 & \multicolumn{2}{c}{Enqueue Time} & \multicolumn{2}{c}{Dequeue Time} \\
+Experiment & Local & Remote & Local & Remote\\
+Mean & 502.98 & 567.21 & 417.69 & 500.4\\
+Standard Deviation & 9.23 & 7.93 & 8.71 & 3.66\\
