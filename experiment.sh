@@ -2,13 +2,17 @@
 
 # This script is used to run the experiment for the paper
 # key value store
-sudo bash kv_script.sh > results/kv.txt
+echo "KV start"
+sudo bash kv_script.sh > results/kv_results.txt
 
 echo "KV done"
 # direct appl. e.g. queue
-sudo bash queue_script.sh > results/queue.txt
+echo "Queue start"
+sudo bash queue_script.sh > results/queue_results.txt
 
 echo "Queue done"
-sudo python3 parser_table.py > results/queue_table.txt
+# parse the results
+echo "Queue stats start"
+sudo python3 parser_table.py > results/queue_stats.txt
 
-echo "Queue table done"
+echo "Queue stats done"

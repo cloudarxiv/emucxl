@@ -5,7 +5,7 @@ make > /dev/null 2>/dev/null
 sudo insmod emucxl_kernel.ko
 for i in {1..10}
 do
-    echo "Running experiments $i"
+    echo "Run $i"
     sudo ./direct_queue
 done
 

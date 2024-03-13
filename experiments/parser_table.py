@@ -4,11 +4,11 @@ import re
 import statistics
 
 # Read text from file
-with open("results/queue.txt", "r") as file:
+with open("results/queue_results.txt", "r") as file:
     text = file.read()
 
 # Extract experiment number, enqueue time, and dequeue time using regular expressions
-experiments = re.findall(r'Running experiments (\d+)', text)
+experiments = re.findall(r'Run (\d+)', text)
 local_enqueue_times = re.findall(r'Local_Enque_Time: ([\d.]+)', text)
 local_dequeue_times = re.findall(r'Local_Deque_Time: ([\d.]+)', text)
 remote_enqueue_times = re.findall(r'Remote_Enque_Time: ([\d.]+)', text)
@@ -19,12 +19,6 @@ table = []
 for i in range(len(experiments)):
     row = [int(experiments[i]), float(local_enqueue_times[i]), float(local_dequeue_times[i]), float(remote_enqueue_times[i]), float(remote_dequeue_times[i])]
     table.append(row)
-
-# Print table
-print("\t & \multicolumn{2}{c}{Enqueue Time} & \multicolumn{2}{c}{Dequeue Time} \\\\")
-print("Experiment & Local & Remote & Local & Remote\\\\")
-for row in table:
-    print(f"{row[0]} & {row[1]} & {row[3]} & {row[2]} & {row[4]} \\\\")
 
 # Calculate mean and standard deviation
 mean_local_enqueue = round(statistics.mean([row[1] for row in table]), 2)
