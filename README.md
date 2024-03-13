@@ -4,13 +4,16 @@ This repository contains the source code and scripts to reproduce the experiment
 
 #### emucxl setup instructions
 emucxl uses the [pond](https://github.com/vtess/Pond) techniques for cxl emulation. 
-Refer to the [emucxl setup README](https://github.com/cloudarxiv/pond-emucxl/tree/master/emucxl) for setting up emucxl on a regular 2-socket (2S) system. Or download the virtual appliance from [here](https://drive.google.com/file/d/1) and put it in the `~/images` directory. Run the following command to start the VM.
+Refer to the [emucxl setup README](https://github.com/cloudarxiv/pond-emucxl/tree/master/emucxl) for setting up emucxl on a regular 2-socket (2S) system. Run the following command to start the VM.
 
 ```bash
     $ bash ./scripts/start_vm.sh
+    # you can configure the remote and local memory size in the start_vm.sh script
 ```
 
-#### Reproduce key value store experiments
+#### Reproduce experiments results
 ```bash
-bash kv_script.sh > result_kv.txt
+    $ cd scripts
+    $ bash ./experiments.sh
+    # The experiments.sh script will run the experiments and generate the results. Results will be stored in the results directory.
 ```
