@@ -195,7 +195,11 @@ static int __init emucxl_mmap_init(void)
 		return ret;
 	}
 
-	if (IS_ERR(cl = class_create(THIS_MODULE, "char")))
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6,4,0)
+    if (IS_ERR(cl = class_create(THIS_MODULE, "char")))
+#else
+    if (IS_ERR(cl = class_create("char")))
+#endif
 	{
 		cdev_del(&c_dev);
 		unregister_chrdev_region(dev, MINOR_CNT);
